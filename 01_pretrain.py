@@ -16,29 +16,9 @@ from pytorch_lightning.callbacks import ModelCheckpoint
 ## import recformer library
 from recformer import RecformerForPretraining, RecformerTokenizer, RecformerConfig, LitWrapper
 from collator import PretrainDataCollatorWithPadding
-from lightning_dataloader import ClickDataset
+from dataloader import PretrainDataset
 
 seed_everything(42)
-
-
-class ClickDataset(Dataset):
-    def __init__(self, dataset: List, collator: PretrainDataCollatorWithPadding):
-        super().__init__()
-
-        self.dataset = dataset
-        self.collator = collator
-
-    def __len__(self):
-        return len(self.dataset)
-
-    def __getitem__(self, index):
-        
-        return self.dataset[index]
-
-    def collate_fn(self, data):
-
-        return self.collator([{'items': line} for line in data])
-
 
 
 
@@ -112,8 +92,8 @@ else:
 ## load data
 
 data_collator = PretrainDataCollatorWithPadding(tokenizer, tokenized_items, mlm_probability=args['mlm_probability'])
-train_data = ClickDataset(json.load(open(args['train_file'])), data_collator)
-dev_data = ClickDataset(json.load(open(args['dev_file'])), data_collator)
+train_data = PretrainDataset(json.load(open(args['train_file'])), data_collator)
+dev_data = PretrainDataset(json.load(open(args['dev_file'])), data_collator)
 
 train_loader = DataLoader(train_data, 
                           batch_size=args['batch_size'], 

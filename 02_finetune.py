@@ -14,7 +14,7 @@ from pytorch_lightning import seed_everything
 from utils import read_json, AverageMeterSet, Ranker
 from recformer import RecformerModel, RecformerForSeqRec, RecformerTokenizer, RecformerConfig
 from collator import FinetuneDataCollatorWithPadding, EvalDataCollatorWithPadding
-from dataloader import RecformerTrainDataset, RecformerEvalDataset
+from dataloader import FinetuneDataset, FinetuneEvalDataset
 
 seed_everything(42)
 
@@ -184,10 +184,9 @@ print("Item List:",len(tokenized_items)) # 5327
 finetune_data_collator = FinetuneDataCollatorWithPadding(tokenizer, tokenized_items)
 eval_data_collator = EvalDataCollatorWithPadding(tokenizer, tokenized_items)
 
-train_data = RecformerTrainDataset(train, collator=finetune_data_collator)
-val_data = RecformerEvalDataset(train, val, test, mode='val', collator=eval_data_collator)
-test_data = RecformerEvalDataset(train, val, test, mode='test', collator=eval_data_collator)
-
+train_data = FinetuneDataset(train, collator=finetune_data_collator)
+val_data = FinetuneEvalDataset(train, val, test, mode='val', collator=eval_data_collator)
+test_data = FinetuneEvalDataset(train, val, test, mode='test', collator=eval_data_collator)
 
 train_loader = DataLoader(train_data, 
                           batch_size=args['batch_size'], 
